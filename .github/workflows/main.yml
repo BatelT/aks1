@@ -1,7 +1,5 @@
 on: [push] 
 
- 
-
 jobs: 
 
   build: 
@@ -46,34 +44,10 @@ jobs:
 
         resource-group: shirispire 
 
+    # Deploy Artifactory
+    - uses: jfrog/setup-jfrog-cli@v1 
+    - run: |
+       jfrog rt config --interactive=false --enc-password=true --url=https://batelt.jfrog.io/batelt/ --user=admin --password=AKCp5dK4h1kFqpKNApsy63cnHFeE5LHwX5evf6dg9uEuYdHxbHfUdiLcjJoDQxxxcrF81mS4m
+       
      
 
-    # Create imagepullsecret for Azure Container registry (ACR) 
-
-    - uses: azure/k8s-create-secret@v1 
-
-      with: 
-
-        container-registry-url: demoaksgithub.azurecr.io 
-
-        container-registry-username: ${{ secrets.REGISTRY_USERNAME }} 
-
-        container-registry-password: ${{ secrets.REGISTRY_PASSWORD }} 
-
-        secret-name: demo-k8s-secret 
-
-        namespace: default 
-
-    # Deploy app to AKS 
-    - uses: azure/k8s-deploy@v1 
-
-      with: 
-
-        manifests: | 
-          /home/runner/work/aks1/aks1/manifests/deployment.yml
-          /home/runner/work/aks1/aks1/manifests/service.yml 
-        images: | 
-          demoaksgithub.azurecr.io/k8sdemo:${{ github.sha }} 
-        imagepullsecrets: | 
-          demo-k8s-secret
-          namespace: default
